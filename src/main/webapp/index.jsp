@@ -8,64 +8,282 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script
-	src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.0-next.18/dist/js/core.iife.js"
-	type="module"></script>
-<script
-	src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.0-next.18/dist/js/icon.iife.js"
-	type="module"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<script src="./index.js"></script>
+<!-- Tailwind CSS via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-<title>Students</title>
+<!-- Fontes e ícones -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Script para alternância de tema claro/escuro -->
+<script>
+    // Verificar preferência de tema ao carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    });
+    
+    // Função para alternar tema
+    function toggleTheme() {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+        }
+    }
+</script>
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Estilização customizada para inputs no modo escuro */
+    .dark input, .dark select, .dark textarea {
+        background-color: #374151;
+        color: #f3f4f6;
+        border-color: #4b5563;
+    }
+    
+    .dark input::placeholder, .dark select::placeholder, .dark textarea::placeholder {
+        color: #9ca3af;
+    }
+    
+    /* Transições suaves */
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
+
+<title>Student Management System</title>
 </head>
 
-<body
-	class="bg-background font-geist-sans text-foreground antialiased flex flex-col gap-1 p-5">
-	<div class="uk-card">
-		<div class="uk-card-body">
-			<table
-				class="uk-table uk-table-middle uk-table-divider uk-table-hover uk-table-sm uk-table-striped">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<!-- <th>Photo</th> -->
-						<th>Name</th>
-						<th>Email</th>
-						<th>Program</th>
-						<th>Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					<%
-					List<Student> students = (List<Student>) request.getAttribute("students");
-					if (students != null && !students.isEmpty()) {
-						for (Student s : students) {
-					%>
-					<tr>
-						<td><%=s.getStudentId()%></td>
-						<!-- <td><img class="uk-preserve-width rounded-full"
-							src="/images/avatar.jpg" width="40" height="40" alt="avatar" />
-						</td> -->
-						<td><%=s.getFirstName() + " " + s.getLastName()%></td>
-						<td class="uk-text-truncate"><%=s.getEmail()%></td>
-						<td class="text-nowrap"><%=s.getProgram()%></td>
-						<td><%=s.getStatus()%></td>
-					</tr>
-					<%
-					}
-					} else {
-					%>
-					<tr>
-						<td colspan="6">No students found.</td>
-					</tr>
-					<%
-					}
-					%>
-				</tbody>
-			</table>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen transition-all">
+    <!-- Cabeçalho -->
+    <header class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                <i class="fas fa-graduation-cap mr-2"></i>Student Management System
+            </h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Manage student records efficiently</p>
+        </div>
+        <button onclick="toggleTheme()" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+        </button>
+    </header>
 
-		</div>
-	</div>
+    <div class="container mx-auto px-4">
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl overflow-hidden mb-8">
+            <!-- Cabeçalho do formulário -->
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 px-6 py-4 border-b border-indigo-100 dark:border-indigo-800/50">
+                <h2 class="text-xl font-semibold text-indigo-700 dark:text-indigo-300 flex items-center">
+                    <i class="fas fa-user-plus mr-2"></i> Register New Student
+                </h2>
+                <p class="text-sm text-indigo-500 dark:text-indigo-400">Fill in the details to register a new student</p>
+            </div>
+            
+            <!-- Formulário de registro -->
+            <div class="p-6">
+                <form action="Students" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+                        <input name="firstName" placeholder="First name" required 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+                        <input name="lastName" placeholder="Last name" required 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</label>
+                        <input type="date" name="dateOfBirth" placeholder="Date of birth" required 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                        <select name="gender" required 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors">
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                        <input type="email" name="email" placeholder="Email" required 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                        <input name="phone" placeholder="Phone" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2 md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
+                        <input name="address" placeholder="Address" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Enrollment Date</label>
+                        <input type="date" name="enrollmentDate" placeholder="Enrollment date" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program</label>
+                        <input name="program" placeholder="Program" required 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Year of Study</label>
+                        <input type="number" name="yearOfStudy" min="1" max="10" placeholder="Year of study" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                        <select name="status" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-colors">
+                            <option value="Active">Active</option>
+                            <option value="Graduated">Graduated</option>
+                            <option value="Suspended">Suspended</option>
+                            <option value="Dropped">Dropped</option>
+                        </select>
+                    </div>
+                    
+                    <div class="md:col-span-2 pt-4">
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center transition-colors">
+                            <i class="fas fa-user-plus mr-2"></i> Register Student
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de estudantes -->
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-xl overflow-hidden">
+            <!-- Cabeçalho da tabela -->
+            <div class="bg-indigo-50 dark:bg-indigo-900/30 px-6 py-4 border-b border-indigo-100 dark:border-indigo-800/50 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-semibold text-indigo-700 dark:text-indigo-300 flex items-center">
+                        <i class="fas fa-users mr-2"></i> Student Records
+                    </h2>
+                    <p class="text-sm text-indigo-500 dark:text-indigo-400">List of all registered students</p>
+                </div>
+                <div class="relative">
+                    <input type="text" placeholder="Search students..." class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white w-64 transition-colors">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Program</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <%
+                        List<Student> students = (List<Student>) request.getAttribute("students");
+                        if (students != null && !students.isEmpty()) {
+                            for (Student s : students) {
+                                String statusColor = "";
+                                if ("Active".equals(s.getStatus())) statusColor = "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+                                else if ("Graduated".equals(s.getStatus())) statusColor = "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+                                else if ("Suspended".equals(s.getStatus())) statusColor = "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+                                else if ("Dropped".equals(s.getStatus())) statusColor = "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+                        %>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"><%=s.getStudentId()%></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 flex-shrink-0">
+                                        <img class="h-10 w-10 rounded-full object-cover" src="https://ui-avatars.com/api/?name=<%=s.getFirstName()%>+<%=s.getLastName()%>&background=6366f1&color=fff" alt="">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="font-medium text-gray-900 dark:text-white"><%=s.getFirstName() + " " + s.getLastName()%></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%=s.getEmail()%></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"><%=s.getProgram()%></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%=statusColor%>">
+                                    <%=s.getStatus()%>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"><i class="fas fa-edit"></i></a>
+                                    <a href="#" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        <%
+                            }
+                        } else {
+                        %>
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center">
+                                <div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                                    <i class="fas fa-user-slash text-4xl mb-3"></i>
+                                    <p class="text-lg font-medium">No students found</p>
+                                    <p class="text-sm">Register a new student to get started</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <%
+                        }
+                        %>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Rodapé da tabela -->
+            <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between">
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium"><%=students != null ? students.size() : 0%></span> results
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                        Previous
+                    </button>
+                    <button class="px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+                        1
+                    </button>
+                    <button class="px-3 py-1 rounded-md bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé da página -->
+    <footer class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400 py-4">
+        <p>© 2023 Student Management System. All rights reserved.</p>
+    </footer>
 </body>
 </html>

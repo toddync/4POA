@@ -1,2 +1,2 @@
-model/Student.class
-servlets/Students.class
+servlets\Students.class
+model\Student.class

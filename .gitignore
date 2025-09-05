@@ -1,0 +1,56 @@
+## Maven / Java
+/target/
+/build/
+**/classes/
+*.class
+*.jar
+*.war
+
+## Build output
+/target/
+/target/**
+
+## IDEs
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+
+## OS files
+.DS_Store
+Thumbs.db
+~$*
+
+## Logs and temp
+*.log
+*.tmp
+*.bak
+
+## Node/npm
+node_modules/
+npm-debug.log*
+
+## Environment / secrets
+.env
+*.secret
+*.key
+*.keystore
+.mysql_history
+
+## Jetty / temporary
+/target/tmp/
+
+## XAMPP / Tomcat local deploys
+# ignore local tomcat work and deployed wars
+tomcat/work/
+tomcat/temp/
+tomcat/logs/
+webapps/*.war
+
+## OneDrive / Editor backup
+*.swp
+*.swo
+
+# End of file
